@@ -22,6 +22,7 @@ async def index():
     df = openpyxl.load_workbook("details.xlsx")
     df1 = df.active
     print(df,df.active)
+    today = date.today()
     # for row in range(0, df1.max_row):
     for col in df1.iter_cols(1,df1.max_column):
         for i in col:
@@ -34,12 +35,19 @@ async def index():
         print(row)
         for i in row:
             print(i.value)
+        
+    
     # print(date_of_birthlist)
     # for i in date_of_birthlist:
     #     print(i.coordinate)
-    print(date.today())
+    # print()
+
     for i in date_of_birthlist:
         if i.value != 'dob':
-            date_of_birth = datetime.strptime(i.value, '%b %d').replace(year=date.today.year)
-            await (date_of_birth == date.today(),hello())
-            print('hi')
+            # datem = datetime.strptime(i.value, "%Y-%m-%d %H:%M:%S")
+            datem = i.value
+            print(datem.day,datem.month)
+            # print((i.value)[:3])
+            # date_of_birth = datetime.strptime(i.value, '%b %d').replace(year=date.today.year)
+            # await (date_of_birth == date.today(),hello())
+            # print('hi')
