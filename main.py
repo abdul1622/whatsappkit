@@ -4,7 +4,7 @@ import openpyxl
 from datetime import date,datetime
 from flask_apscheduler import APScheduler
 import time
-from pywhatkit.whats import sendwhats_image
+from pywhatkit.whats import sendwhats_image,sendwhatmsg_instantly
 
 app = create_app()
 app.debug = True
@@ -18,9 +18,9 @@ if __name__ == "__main__":
 def hello():
     print(hello)
 
-@app.route('/index',methods=['GET'])
+# @app.route('/index',methods=['GET'])
 def index():
-    folder = 'E:\Programming'
+    folder = 'E:\Programming\profile pics'
     group = 'Project batch 7'
     xml_file = (openpyxl.load_workbook("details.xlsx")).active
     today = date.today()
@@ -47,11 +47,13 @@ def index():
 
     print(birth_day_persens ,'hi')
     for i in birth_day_persens:
-        image_path = folder+'/'+ i['image'] +'.png'
-        # sendwhats_image(group,image_path,'hi')
-    return jsonify({'data':'success'})
+        # image_path = folder+"\"+ i['image'] +'.png'
+        image_path = 'E:\Programming\profile pics\profile2.jpg'
+        # https://chat.whatsapp.com/EaEFItUHCXA6qDtGQm8Utu
+        sendwhats_image("EaEFItUHCXA6qDtGQm8Utu",image_path,'hi',90)
+        # sendwhatmsg_instantly("+919566598609", "Hi" ,60, True, 4)
+    # return jsonify({'data':'success'})
 # import time
-
 
 def print_date_time():
     print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
@@ -60,17 +62,18 @@ def print_date_time():
 @app.route('/start',methods=['POST'])
 def start():
     data = request.json
+    scheduler.remove_all_jobs()
     if data['job'] == 'stop'  and scheduler.state:
         scheduler.shutdown()
         return data
     file_path = data['path']
     hour = data['time'][:2]
     minute = data['time'][3:5]
-    app.apscheduler.add_job(func=print_date_time, trigger='cron',day_of_week='mon-sun',hour=hour,minute=minute,id='dob message')  
+    app.apscheduler.add_job(func=index, trigger='cron',day_of_week='mon-sun',hour=hour,minute=minute,id='dob message')  
     if not scheduler.state:
         scheduler.start()
     return data
-    
+
 
 @app.route('/state',methods=['GET'])
 def state():
