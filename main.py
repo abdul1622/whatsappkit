@@ -19,13 +19,32 @@ def hello():
     print(hello)
 
 # @app.route('/index',methods=['GET'])
-def index():
+def index(persons):
+    birth_day_persons = []
+    today = date.today()
+    for i in persons:
+        if isinstance(i['dob'],str):
+            print(i['dob'])
+            i['dob'] = datetime.strptime(i['dob'],'%d/%m/%Y')
+        if i['dob'].day == today.day and i['dob'].month == today.month:
+            birth_day_persons.append(i)
+
+    print(birth_day_persons ,'hi')
+    for i in birth_day_persons:
+        image_path = 'E:\Programming\profile pics\profile2.jpg'
+        sendwhats_image("EaEFItUHCXA6qDtGQm8Utu",image_path,'hi',90)
+
+# def print_date_time():
+#     print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
+
+# to start sheduler path to xl file and time message
+@app.route('/start',methods=['POST'])
+def start():
+    data = request.json
     folder = 'E:\Programming\profile pics'
     group = 'Project batch 7'
     xml_file = (openpyxl.load_workbook("details.xlsx")).active
-    today = date.today()
     persons = []
-    birth_day_persens = []
     keys =[]
     h = list(xml_file.rows)[0]
     for i in h:
@@ -38,30 +57,6 @@ def index():
         persons.append(data)
                 
     print(persons)
-    for i in persons:
-        if isinstance(i['dob'],str):
-            print(i['dob'])
-            i['dob'] = datetime.strptime(i['dob'],'%d/%m/%Y')
-        if i['dob'].day == today.day and i['dob'].month == today.month:
-            birth_day_persens.append(i)
-
-    print(birth_day_persens ,'hi')
-    for i in birth_day_persens:
-        # image_path = folder+"\"+ i['image'] +'.png'
-        image_path = 'E:\Programming\profile pics\profile2.jpg'
-        # https://chat.whatsapp.com/EaEFItUHCXA6qDtGQm8Utu
-        sendwhats_image("EaEFItUHCXA6qDtGQm8Utu",image_path,'hi',90)
-        # sendwhatmsg_instantly("+919566598609", "Hi" ,60, True, 4)
-    # return jsonify({'data':'success'})
-# import time
-
-def print_date_time():
-    print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
-
-# to start sheduler path to xl file and time message
-@app.route('/start',methods=['POST'])
-def start():
-    data = request.json
     scheduler.remove_all_jobs()
     if data['job'] == 'stop'  and scheduler.state:
         scheduler.shutdown()
@@ -69,20 +64,7 @@ def start():
     file_path = data['path']
     hour = data['time'][:2]
     minute = data['time'][3:5]
-    app.apscheduler.add_job(func=index, trigger='cron',day_of_week='mon-sun',hour=hour,minute=minute,id='dob message')  
+    app.apscheduler.add_job(func=index(persons), trigger='cron',day_of_week='mon-sun',hour=hour,minute=minute,id='dob message')  
     if not scheduler.state:
         scheduler.start()
     return data
-
-
-@app.route('/state',methods=['GET'])
-def state():
-    print(scheduler.state)
-    return {'data':scheduler.state}
-# scheduler = BackgroundScheduler()
-# scheduler.add_job(func=print_date_time, trigger="interval", seconds=10)
-# app.apscheduler.add_job(func=print_date_time, trigger='interval', seconds=10,id='id')
-
-
-# Shut down the scheduler when exiting the app
-# atexit.register(lambda: scheduler.shutdown())
